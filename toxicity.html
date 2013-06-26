@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<script src="jquery-1.9.1.min.js"></script>
+		<script src="d3.v3.min.js"></script>
+	</head>
+	<body>
+		<h1>Toxicity Chart</h1>
+
+		<script>
+
+		toxicity = {}
+
+		toxicity.calc = function(xmldoc) {
+	
+			var xml = $(xmldoc);
+			var filenodes = xml.find("file");
+			var result = $.map(filenodes, function(node, idx) {
+				return { 
+					name: $(node).attr("name"),
+					score: 15
+				}
+			});
+			return result;
+		}
+
+
+		toxicity.draw = function(data) {
+
+			var CHEIGHT = 600;
+			var BWIDTH = 5;
+			var BGAP = 0;
+			var LEFTSPACE = 40;
+
+			data.sort(function(da, db) { return db.score - da.score })
+
+			d3.selectAll("svg").remove();
+			var chart = d3.select("body").append("svg")
+				.attr("class", "chart")
+				.attr("width", (BWIDTH + BGAP) * data.length)
+				.attr("height", CHEIGHT + 5); /* to accomodate bottom label */
+		
+			var xscale = d3.scale.linear()
+				.domain([0, data.length])
+				.rangeRound([LEFTSPACE, (BWIDTH + BGAP) * data.length + LEFTSPACE])
+		
+			var yscale = d3.scale.linear()
+				.domain([0, d3.max(data, function(d) { return d.score })])
+				.rangeRound([CHEIGHT, 1]);
+
+			var yaxis = d3.svg.axis()
+				.scale(yscale)
+				.orient("left")
+				.ticks(10);
+		
+			chart.selectAll("line")
+				.data(yscale.ticks(10))
+				.enter().append("line")
+				.attr("x1", function(td) { return xscale(0) })
+				.attr("x2", function(td) { return xscale(data.length) })
+				.attr("y1", yscale)
+				.attr("y2", yscale)
+				.style("stroke", "#ccc");
+
+			chart.selectAll("rect")
+				.data(data)
+				.enter().append("rect")
+				.attr("x", function(d, i) { return xscale(i) })
+				.attr("y", function(d) { return yscale(d.score) })
+				.attr("height", function(d) { return CHEIGHT - yscale(d.score) })
+				.attr("width", BWIDTH)
+				.attr("shape-rendering", "crispEdges")
+				.style("fill", function(d) { return "hsl(200, 80%, 20%)" });
+						
+			chart.append("g")
+				.attr("class", "axis")
+				.attr("transform", "translate(" + LEFTSPACE + ", 0)")
+				.call(yaxis);
+		}
+
+
+		var data = null;
+		redraw = function(error, xmldoc) {
+			if (xmldoc != null) {
+				data = toxicity.calc(xmldoc)
+			}
+			toxicity.draw(data)
+		}
+		$(document).ready(d3.xml("data/checkstyle_output.xml", redraw));
+
+		</script>
+
+	</body>
+</html>
