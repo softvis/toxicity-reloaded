@@ -7,21 +7,6 @@ h1 {
 	margin: 0.3em 0;
 }
 
-.formlabel {
-	vertical-align: baseline;
-	border-left: 2px solid #CCC;
-	margin: 0 0.1em 0 0.4em;
-	padding-left: 0.5em;
-}
-
-select, input {
-	font-size: 1.1em;
-}
-
-form {
-	margin-bottom: 2em;
-}
-
 .axis path {
 	opacity: 0;	
 }

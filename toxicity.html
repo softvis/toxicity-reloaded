@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<link rel="stylesheet" type="text/css" href="style.css">
+		<link rel="stylesheet" type="text/css" href="toxicity.css">
 		<script src="jquery-1.9.1.min.js"></script>
 		<script src="d3.v3.min.js"></script>
 	</head>
@@ -14,7 +14,7 @@
 		draw = function(error, xmldoc) {
 			toxicity.draw(toxicity.calc(xmldoc))		
 		};
-		$(document).ready(d3.xml("data/checkstyle_output.xml", draw));
+		$(document).ready(d3.xml("checkstyle_output.xml", draw));
 		</script>
 
 	</body>
