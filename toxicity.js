@@ -1,6 +1,32 @@
 
 toxicity = {}
 
+toxicity.checknames = [
+	"BooleanExpressionComplexity", 
+	"ClassDataAbstractionCoupling", 
+	"ClassFanOutComplexity",
+	"CyclomaticComplexity",
+	"FileLength",
+	"MethodLength",
+	"NestedIfDepth",
+	"AnonInnerLength",
+	"ParamterNumber",
+	"MissingSwitchDefault"
+];
+
+toxicity.colors = [
+	"#989BFA",
+	"#9C4B45",
+	"#8EA252",
+	"#6D5A8D",
+	"#5396AC",
+	"#CE8743",
+	"#96A9CD",
+	"#C79593",
+	"#BCCA98",
+	"#E9C197"
+];
+
 toxicity.calc = function(xmldoc) {
 	var filenodes = $(xmldoc).find("file");
 	return $.map(filenodes, toxicity.calcfile);
@@ -26,38 +52,12 @@ toxicity.calcfile = function(fnode, fidx) {
 toxicity.draw = function(scores) {
 	var CHEIGHT = 600;
 	var BWIDTH = 6;
-	var BGAP = 3;
+	var BGAP = 2;
 	var LEFTSPACE = 40;
-
-	var checknames = [
-		"BooleanExpressionComplexity", 
-		"ClassDataAbstractionCoupling", 
-		"ClassFanOutComplexity",
-		"CyclomaticComplexity",
-		"FileLength",
-		"MethodLength",
-		"NestedIfDepth",
-		"AnonInnerLength",
-		"ParamterNumber",
-		"MissingSwitchDefault"
-	];
-		
-	var colors = [
-		"#989BFA",
-		"#9C4B45",
-		"#8EA252",
-		"#6D5A8D",
-		"#5396AC",
-		"#CE8743",
-		"#96A9CD",
-		"#C79593",
-		"#BCCA98",
-		"#E9C197"
-	];
 
 	scores.sort(function(da, db) { return db.total - da.total })
 		
-	var checks = d3.layout.stack()(checknames.map(function(checkname) {
+	var checks = d3.layout.stack()(toxicity.checknames.map(function(checkname) {
 		return scores.map(function(d, i) {
 			return { x: i, y: d[checkname] || 0, score: d };
 		});
@@ -74,7 +74,8 @@ toxicity.draw = function(scores) {
 		.rangeRound([LEFTSPACE, (BWIDTH + BGAP) * scores.length + LEFTSPACE])
 
 	var yscale = d3.scale.linear()
-		.domain([0, d3.max(scores, function(d) { return d.total })])
+	//.domain([0, d3.max(scores, function(d) { return d.total })])
+		.domain([0, 39])
 		.rangeRound([CHEIGHT, 1]);
 
 	var yaxis = d3.svg.axis()
@@ -82,7 +83,7 @@ toxicity.draw = function(scores) {
 		.orient("left")
 		.ticks(10);
 		
-	var fscale = d3.scale.ordinal().range(colors);
+	var fscale = d3.scale.ordinal().range(toxicity.colors);
 
 	chart.selectAll("line")
 		.data(yscale.ticks(10))
@@ -134,18 +135,33 @@ tooltip = function(a) {
 			  div.html("");
 				div.append("h2").text(d._name);
 				div.append("p").attr("class", "filename").text(d._path.split("/").slice(0, -1).join("/"));
-				for (var p in d) {
-				  if (d.hasOwnProperty(p) && (p.indexOf("_") != 0)) {
-						div.append("p").text(p + ": " + Math.round(d[p] * 10) / 10);
-				  }
-				}
+				$(toxicity.checknames.slice(0).reverse()).each(function(i, c) {
+					if(d[c] > 0) {
+						var color = toxicity.colors[toxicity.colors.length - i - 1];
+						var p = div.append("p");
+						p.append("span")
+							.html("&nbsp;")
+							.style("border", "1px solid " + d3.rgb(color).darker())
+							.style("background-color", color)
+							.style("margin-right", "2px");
+						p.append("span")
+							.text(c + ": " + Math.round(d[c] * 10) / 10);
+						}
+				});
+				var p = div.append("p");
+					p.append("span")
+						.html("&nbsp;")
+						.style("margin-right", "4px");
+					p.append("span")
+						.text("Total: " + Math.round(d.total * 10) / 10)
+						.style("font-weight", "bold");
 				var ttx = d3.event.pageX;
 				var tty = d3.event.pageY - $("div.tooltip").height() - 15;
-				var hclip = (ttx + $("div.tooltip").width()) - ($(window).width() + $(window).scrollLeft())
+				var hclip = (ttx + $("div.tooltip").width() + 20) - ($(window).width() + $(window).scrollLeft())
 				if (hclip > 0) {
 					ttx -= hclip
 				}
-				div.style("left", Math.max(ttx - 20, $(window).scrollLeft() + 5) + "px")     
+				div.style("left", Math.max(ttx + 4, $(window).scrollLeft() + 5) + "px")     
 					 .style("top", Math.max(tty, $(window).scrollTop() + 5) + "px");
 				div.transition().duration(100).style("opacity", 0.95);
 			})
