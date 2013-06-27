@@ -10,7 +10,7 @@ toxicity.checknames = [
 	"MethodLength",
 	"NestedIfDepth",
 	"AnonInnerLength",
-	"ParamterNumber",
+	"ParameterNumber",
 	"MissingSwitchDefault"
 ];
 
@@ -42,7 +42,7 @@ toxicity.calcfile = function(fnode, fidx) {
 		$(fnode).children().each(function(eidx, enode) {
 			var check = $(enode).attr("source").split(".").slice(-1)[0].replace(/Check$/, "")
 			var matches = $(enode).attr("message").replace(/,/g, "").match(/(\d+)/g)
-			var score = matches ? (matches[0] / matches [1]) : 1;
+			var score = (matches && matches.length > 1) ? (matches[0] / matches [1]) : 1;
 			result[check] = (result[check] || 0) + score
 			result.total += score;
 		});
@@ -66,7 +66,7 @@ toxicity.draw = function(scores) {
 	d3.selectAll("svg").remove();
 	var chart = d3.select("body").append("svg")
 		.attr("class", "chart")
-		.attr("width", LEFTSPACE + (BWIDTH + BGAP) * scores.length)
+		.attr("width", LEFTSPACE + (BWIDTH + BGAP) * scores.length + 10)
 		.attr("height", CHEIGHT + 5); /* to accomodate bottom label */
 
 	var xscale = d3.scale.linear()
@@ -75,7 +75,7 @@ toxicity.draw = function(scores) {
 
 	var yscale = d3.scale.linear()
 	//.domain([0, d3.max(scores, function(d) { return d.total })])
-		.domain([0, 39])
+		.domain([0, 62])
 		.rangeRound([CHEIGHT, 1]);
 
 	var yaxis = d3.svg.axis()
