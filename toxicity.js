@@ -8,17 +8,19 @@ toxicity.calc = function(xmldoc) {
 
 toxicity.calcfile = function(fnode, fidx) {
 		var path = $(fnode).attr("name").replace(/\\/g, "/");
-		var score = 0;
-		$(fnode).children().each(function(eidx, enode) {
-			var msg = $(enode).attr("message");
-			var matches = msg.replace(/,/g, "").match(/(\d+)/g)
-			score += matches ? (matches[0] / matches [1]) : 1;
-		});
-		return score ? {
-			_name: path.split("/").slice(-1), 
+		var result = {
+			_name: path.split("/").slice(-1)[0], 
 			_path: path,
-			score: Math.round(score * 10) / 10
-		} : null;
+			total: 0
+		};
+		$(fnode).children().each(function(eidx, enode) {
+			var check = $(enode).attr("source").split(".").slice(-1)[0].replace(/Check$/, "")
+			var matches = $(enode).attr("message").replace(/,/g, "").match(/(\d+)/g)
+			var score = matches ? (matches[0] / matches [1]) : 1;
+			result[check] = (result[check] || 0) + score
+			result.total += score;
+		});
+		return result.total ? result : null;
 };
 
 toxicity.draw = function(data) {
@@ -27,7 +29,7 @@ toxicity.draw = function(data) {
 	var BGAP = 3;
 	var LEFTSPACE = 40;
 
-	data.sort(function(da, db) { return db.score - da.score })
+	data.sort(function(da, db) { return db.total - da.total })
 
 	d3.selectAll("svg").remove();
 	var chart = d3.select("body").append("svg")
@@ -40,7 +42,7 @@ toxicity.draw = function(data) {
 		.rangeRound([LEFTSPACE, (BWIDTH + BGAP) * data.length + LEFTSPACE])
 
 	var yscale = d3.scale.linear()
-		.domain([0, d3.max(data, function(d) { return d.score })])
+		.domain([0, d3.max(data, function(d) { return d.total })])
 		.rangeRound([CHEIGHT, 1]);
 
 	var yaxis = d3.svg.axis()
@@ -61,8 +63,8 @@ toxicity.draw = function(data) {
 		.data(data)
 		.enter().append("rect")
 		.attr("x", function(d, i) { return xscale(i) })
-		.attr("y", function(d) { return yscale(d.score) })
-		.attr("height", function(d) { return CHEIGHT - yscale(d.score) })
+		.attr("y", function(d) { return yscale(d.total) })
+		.attr("height", function(d) { return CHEIGHT - yscale(d.total) })
 		.attr("width", BWIDTH)
 		.attr("shape-rendering", "crispEdges")
 		.style("fill", function(d) { return "hsl(200, 80%, 20%)" })
@@ -94,7 +96,7 @@ tooltip = function(a) {
 				div.append("p").attr("class", "filename").text(d._path.split("/").slice(0, -1).join("/"));
 				for (var p in d) {
 				  if (d.hasOwnProperty(p) && (p.indexOf("_") != 0)) {
-						div.append("p").text(p + ": " + d[p]);
+						div.append("p").text(p + ": " + Math.round(d[p] * 10) / 10);
 				  }
 				}
 				var ttx = d3.event.pageX;
