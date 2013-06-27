@@ -23,53 +23,93 @@ toxicity.calcfile = function(fnode, fidx) {
 		return result.total ? result : null;
 };
 
-toxicity.draw = function(data) {
+toxicity.draw = function(scores) {
 	var CHEIGHT = 600;
 	var BWIDTH = 6;
 	var BGAP = 3;
 	var LEFTSPACE = 40;
 
-	data.sort(function(da, db) { return db.total - da.total })
+	var checknames = [
+		"BooleanExpressionComplexity", 
+		"ClassDataAbstractionCoupling", 
+		"ClassFanOutComplexity",
+		"CyclomaticComplexity",
+		"FileLength",
+		"MethodLength",
+		"NestedIfDepth",
+		"AnonInnerLength",
+		"ParamterNumber",
+		"MissingSwitchDefault"
+	];
+		
+	var colors = [
+		"#989BFA",
+		"#9C4B45",
+		"#8EA252",
+		"#6D5A8D",
+		"#5396AC",
+		"#CE8743",
+		"#96A9CD",
+		"#C79593",
+		"#BCCA98",
+		"#E9C197"
+	];
+
+	scores.sort(function(da, db) { return db.total - da.total })
+		
+	var checks = d3.layout.stack()(checknames.map(function(checkname) {
+		return scores.map(function(d, i) {
+			return { x: i, y: d[checkname] || 0, score: d };
+		});
+	}));
 
 	d3.selectAll("svg").remove();
 	var chart = d3.select("body").append("svg")
 		.attr("class", "chart")
-		.attr("width", LEFTSPACE + (BWIDTH + BGAP) * data.length)
+		.attr("width", LEFTSPACE + (BWIDTH + BGAP) * scores.length)
 		.attr("height", CHEIGHT + 5); /* to accomodate bottom label */
 
 	var xscale = d3.scale.linear()
-		.domain([0, data.length])
-		.rangeRound([LEFTSPACE, (BWIDTH + BGAP) * data.length + LEFTSPACE])
+		.domain([0, scores.length])
+		.rangeRound([LEFTSPACE, (BWIDTH + BGAP) * scores.length + LEFTSPACE])
 
 	var yscale = d3.scale.linear()
-		.domain([0, d3.max(data, function(d) { return d.total })])
+		.domain([0, d3.max(scores, function(d) { return d.total })])
 		.rangeRound([CHEIGHT, 1]);
 
 	var yaxis = d3.svg.axis()
 		.scale(yscale)
 		.orient("left")
 		.ticks(10);
+		
+	var fscale = d3.scale.ordinal().range(colors);
 
 	chart.selectAll("line")
 		.data(yscale.ticks(10))
 		.enter().append("line")
 		.attr("x1", function(td) { return xscale(0) })
-		.attr("x2", function(td) { return xscale(data.length) })
+		.attr("x2", function(td) { return xscale(scores.length) })
 		.attr("y1", yscale)
 		.attr("y2", yscale)
 		.style("stroke", "#ccc");
 
-	chart.selectAll("rect")
-		.data(data)
+  var groups = chart.selectAll("g.checks")
+		.data(checks)
+		.enter().append("g")
+		.attr("class", "check")
+		.style("fill", function(d, i) { return fscale(i); })
+		.style("stroke", function(d, i) { return d3.rgb(fscale(i)).darker(); });
+
+	groups.selectAll("rect")
+		.data(Object)
 		.enter().append("rect")
-		.attr("x", function(d, i) { return xscale(i) })
-		.attr("y", function(d) { return yscale(d.total) })
-		.attr("height", function(d) { return CHEIGHT - yscale(d.total) })
-		.attr("width", BWIDTH)
+		.attr("x", function(d) { return xscale(d.x); })
+		.attr("y", function(d) { return yscale(d.y + d.y0); })
+		.attr("height", function(d) { return CHEIGHT - yscale(d.y); })
+		.attr("width", function(d) { return BWIDTH; })
 		.attr("shape-rendering", "crispEdges")
-		.style("fill", function(d) { return "hsl(200, 80%, 20%)" })
-		.call(tooltip());
-				
+		.call(tooltip(function(d) { return d.score; }));
+					
 	chart.append("g")
 		.attr("class", "axis")
 		.attr("transform", "translate(" + LEFTSPACE + ", 0)")
