@@ -22,6 +22,11 @@ h1 {
   font-size: 11px;
 }
 
+#chart-wrapper {
+	width: 100%;
+	overflow-x: auto;
+}
+
 div.tooltip {   
   position: absolute;           
   text-align: left;           
