@@ -108,7 +108,6 @@ toxicity.draw = function(scores) {
 		.attr("y", function(d) { return yscale(d.y + d.y0); })
 		.attr("height", function(d) { return CHEIGHT - yscale(d.y); })
 		.attr("width", function(d) { return BWIDTH; })
-		.attr("shape-rendering", "crispEdges")
 		.call(tooltip(function(d) { return d.score; }));
 					
 	chart.append("g")
