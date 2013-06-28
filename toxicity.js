@@ -50,10 +50,10 @@ toxicity.calcfile = function(fnode, fidx) {
 };
 
 toxicity.draw = function(scores) {
-	var CHEIGHT = 600;
+	var CHEIGHT = 425;
 	var BWIDTH = 6;
 	var BGAP = 2;
-	var LEFTSPACE = 40;
+	var LEFTSPACE = 25;
 
 	scores.sort(function(da, db) { return db.total - da.total })
 		
@@ -75,7 +75,7 @@ toxicity.draw = function(scores) {
 
 	var yscale = d3.scale.linear()
 	//.domain([0, d3.max(scores, function(d) { return d.total })])
-		.domain([0, 62])
+		.domain([0, 42])
 		.rangeRound([CHEIGHT, 1]);
 
 	var yaxis = d3.svg.axis()
@@ -140,21 +140,19 @@ tooltip = function(a) {
 						var color = toxicity.colors[toxicity.colors.length - i - 1];
 						var p = div.append("p");
 						p.append("span")
-							.html("&nbsp;")
-							.style("border", "1px solid " + d3.rgb(color).darker())
-							.style("background-color", color)
-							.style("margin-right", "2px");
+							.attr("class", "tooltip-swatch")
+							.style("color", d3.rgb(color).darker())
+							.style("background-color", color);
 						p.append("span")
 							.text(c + ": " + Math.round(d[c] * 10) / 10);
 						}
 				});
 				var p = div.append("p");
 					p.append("span")
-						.html("&nbsp;")
-						.style("margin-right", "4px");
+						.attr("class", "tooltip-swatch");
 					p.append("span")
-						.text("Total: " + Math.round(d.total * 10) / 10)
-						.style("font-weight", "bold");
+						.attr("class", "total")
+						.text("Total: " + Math.round(d.total * 10) / 10);
 				var ttx = d3.event.pageX;
 				var tty = d3.event.pageY - $("div.tooltip").height() - 15;
 				var hclip = (ttx + $("div.tooltip").width() + 20) - ($(window).width() + $(window).scrollLeft())
