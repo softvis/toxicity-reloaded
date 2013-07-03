@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "-//Puppy Crawl//DTD Check Configuration 1.2//EN" "http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
+
+<module name="Checker">
+	<property name="severity" value="warning"/>
+	
+	<module name="TreeWalker">
+		<module name="FileContentsHolder"/>
+
+		<module name="AnonInnerLength">
+			<property name="max" value="35"/>
+		</module>
+		<module name="FileLength">
+			<property name="max" value="500"/>
+		</module>
+		<module name="MethodLength">
+			<property name="max" value="30"/>
+		</module>
+		<module name="ParameterNumber">
+			<property name="max" value="6"/>
+		</module>
+		<module name="MissingSwitchDefault"/>
+
+		<module name="NestedIfDepth">
+			<property name="max" value="3"/>
+		</module>
+		<module name="NestedTryDepth">
+			<property name="max" value="2"/>
+		</module>
+		<module name="BooleanExpressionComplexity"/>
+		<module name="ClassDataAbstractionCoupling">
+			<property name="max" value="10"/>
+		</module>
+		<module name="ClassFanOutComplexity">
+			<property name="max" value="30"/>
+		</module>
+		<module name="CyclomaticComplexity">
+			<property name="max" value="10"/>
+		</module>
+	</module>
+</module>

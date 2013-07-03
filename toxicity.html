@@ -7,14 +7,23 @@
 	</head>
 	<body>
 		<h1>Toxicity Chart</h1>
+		<form action="#" method="get">
+			<input type="file" id="data-file" name="files[]">
+		</form>
+		<hr>
 
 		<script src="toxicity.js">
 		</script>
 		<script>
-		draw = function(error, xmldoc) {
-			toxicity.draw(toxicity.calc(xmldoc))		
+		function load(selEvent) {
+			var reader = new FileReader();
+			reader.onload = function(loadEvent) {
+				var xmldoc = $.parseXML(loadEvent.target.result)
+				toxicity.draw(toxicity.calc(xmldoc))		
+			}
+			reader.readAsText(selEvent.target.files[0]); 
 		};
-		$(document).ready(d3.xml("checkstyle_output.xml", draw));
+		$('input[type=file]').change(load);
 		</script>
 
 		<div id="chart-wrapper">
