@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="toxicity.css">
+		<script src="jquery-1.9.1.min.js"></script>
+		<script src="d3.v3.min.js"></script>
+	</head>
+	<body>
+		<h1>Toxicity Chart</h1>
+		<form action="#" method="get">
+			<input type="file" id="data-file" name="files[]">
+		</form>
+		<hr>
+
+		<script src="toxicity.js">
+		</script>
+		<script>
+		function load(selEvent) {
+			var reader = new FileReader();
+			reader.onload = function(loadEvent) {
+				var xmldoc = $.parseXML(loadEvent.target.result)
+				toxicity.draw(toxicity.calc(xmldoc))		
+			}
+			reader.readAsText(selEvent.target.files[0]); 
+		};
+		$('input[type=file]').change(load);
+		</script>
+
+		<div id="chart-wrapper">
+		</div>
+
+		<p>Hover over the bars to see detailed information about the score for the class.
+			
+		<p>The y-axis is fixed with 41 as a maximum to make it easier to compare charts for different code-bases.
+
+	</body>
+</html>
