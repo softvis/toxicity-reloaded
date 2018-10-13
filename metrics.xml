@@ -9,7 +9,6 @@
 	</module>
 	
 	<module name="TreeWalker">
-		<module name="FileContentsHolder"/>
 
 		<module name="AnonInnerLength">
 			<property name="max" value="35"/>
