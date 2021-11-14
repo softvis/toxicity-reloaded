@@ -7,9 +7,9 @@
 	<module name="FileLength">
 		<property name="max" value="500"/>
 	</module>
-	
+
 	<module name="TreeWalker">
-		<module name="FileContentsHolder"/>
+<!--		<module name="FileContentsHolder"/>-->
 
 		<module name="AnonInnerLength">
 			<property name="max" value="35"/>
