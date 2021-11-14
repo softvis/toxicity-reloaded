@@ -15,5 +15,5 @@ Apologies for the hackneyed name. In my defence, though, you can load and reload
 
 [1]: http://erik.doernenburg.com/2008/11/how-toxic-is-your-code/
 [2]: http://d3js.org
-[3]: https://sourceforge.net/projects/checkstyle/files/checkstyle/
+[3]: https://github.com/checkstyle/checkstyle/releases/
 
